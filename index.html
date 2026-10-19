@@ -6,6 +6,7 @@
 <title>Recorridos hamiltonianos entre 8 restaurantes de Huehuetenango</title>
 <!-- Icono de la pestaña (Favicon) -->
 <link rel="icon" type="image/png" href="Img/logo-umg.png">
+<!-- Enlace al archivo CSS -->
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -130,7 +131,16 @@
   </div>
   <p class="estado" id="estado"></p>
   <p class="ruta" id="ruta"></p>
-  <svg id="svg" class="board" viewBox="0 0 640 460" role="group" aria-label="Grafo de 8 restaurantes de Huehuetenango con distancias verificadas en metros"></svg>
+  
+  <div style="position: relative;" id="map-wrap">
+    <svg id="svg" class="board" viewBox="0 0 640 460" role="group" aria-label="Grafo de 8 restaurantes de Huehuetenango con distancias verificadas en metros"></svg>
+    <!-- Ventanita emergente (Tooltip) -->
+    <div id="nodo-tooltip">
+      <img id="tt-img" src="" alt="Foto del restaurante">
+      <b id="tt-nombre">Nombre</b>
+    </div>
+  </div>
+
   <div class="bar"><i id="barfill"></i></div>
   <div id="prog" aria-label="Pasos del recorrido"></div>
   <div id="leyenda"></div>

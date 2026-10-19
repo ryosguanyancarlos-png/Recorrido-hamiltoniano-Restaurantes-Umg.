@@ -18,7 +18,7 @@ const N=[
   {id:'R1',name:'Ristorante Italiano Il Pomodoro',s:'Il Pomodoro',dir:'4ª Calle 8-40, Zona 1',t:'italiana',x:320,y:80},
   {id:'R2',name:'Monte Alto Restaurante',s:'Monte Alto',dir:'5ª Avenida 6-46, Zona 1',t:'cafe',x:220,y:260},
   {id:'R3',name:'Casa Brava',s:'Casa Brava',dir:'8ª Calle A 11-70, Zona 1',t:'carnes',x:440,y:350},
-  {id:'R4',name:'Pizzeria Bistro Dolce Vita',s:'Dolce Vita',dir:'1 calle 6-73, Zona 8',t:'cafe',x:360,y:230},
+  {id:'R4',name:'Coffee 8',s:'Coffee 8',dir:'1 calle 6-73, Zona 8',t:'cafe',x:360,y:230},
   {id:'R5',name:'Casa de Asados',s:'Casa de Asados',dir:'4ª Calle 5-20, Zona 1',t:'carnes',x:570,y:280},
   {id:'R6',name:'Restaurante Puerto Escondido',s:'Puerto Escondido',dir:'Sector 6, Cambote, Zona 11',t:'mariscos',x:70,y:400},
   {id:'R7',name:'Café La Tinaja',s:'La Tinaja',dir:'4ª Calle 6-51, Zona 1',t:'cafe',x:460,y:70},
@@ -75,7 +75,7 @@ const dot=c=>`<span class="dot" style="background:${c}"></span>`;
 
 $('#gn').textContent=n; $('#gm').textContent=E.length;
 $('#tv').innerHTML='<tr><th>Vértice</th><th>Restaurante</th><th>Dirección</th><th>Tipo</th><th>Grado</th></tr>'+N.map(o=>`<tr><td>${sub(o.id)}</td><td>${esc(o.name)}</td><td>${esc(o.dir)}</td><td>${dot(col(o.id))}${TIPOS[o.t].n}</td><td class="num">${deg(o.id)}</td></tr>`).join('');
-$('#te').innerHTML='<tr><th>#</th><th>Arista</th><th>Distancia real (m)</th></tr>'+E.map(([a,b,d],k)=>`<tr><td>${k+1}</td><td>{${sub(a)}, ${sub(b)}}</td><td class="num">${d}</td></tr>`).join('');
+$('#te').innerHTML='<tr><th>#</th><th>Arista</th><th>Metros</th></tr>'+E.map(([a,b,d],k)=>`<tr><td>${k+1}</td><td>{${sub(a)}, ${sub(b)}}</td><td class="num">${d}</td></tr>`).join('');
 const mat=f=>'<tr><th></th>'+ids.map(v=>`<th>${sub(v)}</th>`).join('')+'</tr>'+ids.map(r=>`<tr><th>${sub(r)}</th>${ids.map(c=>f(r,c)).join('')}</tr>`).join('');
 $('#tm').innerHTML=mat((r,c)=>W.has(key(r,c))?`<td class="u">${W.get(key(r,c))}</td>`:'<td class="z">·</td>');
 $('#a01').innerHTML='<tr><th>Vértices</th>'+ids.map(v=>`<th>${sub(v)}</th>`).join('')+'<th>Grado deg(v)</th></tr>'+ids.map(r=>`<tr><th>${sub(r)}</th>${ids.map(c=>{const u=W.has(key(r,c));return `<td class="${u?'u':'z'}">${+u}</td>`}).join('')}<td><b>${deg(r)}</b></td></tr>`).join('');
@@ -86,7 +86,7 @@ $('#dif').innerHTML=`<tr><th></th><th>Camino hamiltoniano</th><th>Ciclo hamilton
 <tr><td>Extremos</td><td>Inicio y final distintos; no tienen que ser adyacentes</td><td>El final es adyacente al inicio y la ruta regresa a él (se lista el inicio otra vez al cerrar)</td></tr>
 <tr><td>Relación</td><td colspan="2">Si hay un ciclo hamiltoniano, quitando una arista queda un camino hamiltoniano. El recíproco es falso: puede haber camino y no haber ciclo.</td></tr>`;
 
-$('#adj').innerHTML='<thead><tr><th>Vértice</th><th>Vecinos (distancia verificada en m)</th><th>Grado</th></tr></thead><tbody>'+ids.map(v=>`<tr><td>${sub(v)}</td><td>${adj[v].map(([u,d])=>`${sub(u)} (${d})`).join(', ')}</td><td class="num">${deg(v)}</td></tr>`).join('')+`</tbody><tfoot><tr><th colspan="2">Suma de grados</th><th class="num">${sd}</th></tr></tfoot>`;
+$('#adj').innerHTML='<thead><tr><th>Vértice</th><th>Vecinos (Metros)</th><th>Grado</th></tr></thead><tbody>'+ids.map(v=>`<tr><td>${sub(v)}</td><td>${adj[v].map(([u,d])=>`${sub(u)} (${d})`).join(', ')}</td><td class="num">${deg(v)}</td></tr>`).join('')+`</tbody><tfoot><tr><th colspan="2">Suma de grados</th><th class="num">${sd}</th></tr></tfoot>`;
 $('#hand').innerHTML=`Σ deg(v) = ${ids.map(deg).join(' + ')} = <b>${sd}</b> · |E| = <b>${E.length}</b> · 2|E| = <b>${2*E.length}</b> → ${sd===2*E.length?'coinciden ✓':'NO coinciden ✗'}`;
 $('#cond').innerHTML=[
   `<b>Conexo</b> (necesario): ${conn?'sí, hay trayecto entre cualquier par de restaurantes.':'no; sin conexión no puede haber camino hamiltoniano.'}`,
@@ -122,7 +122,11 @@ function graphMarkup(mini,cycle){
   const labs=mini?'':E.map(([a,b,d])=>pill(key(a,b),d,(pos[a].x+pos[b].x)/2,(pos[a].y+pos[b].y)/2)).join('');
   const nodes=N.map(o=>`<g class="node" data-v="${o.id}" ${mini?'':`tabindex="0" role="button" aria-label="${esc(o.name)}"`} transform="translate(${o.x} ${o.y})" style="--c:${col(o.id)}"><title>${esc(o.name)}</title><circle class="halo" r="27"/><circle class="ring" r="31"/><circle class="c" r="20"/><text class="lt">${o.id}</text><text class="nm" y="-30">${esc(o.s)}</text>${mini?'':'<text class="tag" x="30" y="4">inicio</text>'}</g>`).join('');
   const brujula=mini?'':`<g transform="translate(606 418)" fill="#fff" fill-opacity=".75"><path d="M0-17 6 6 0 2-6 6Z"/><text y="22" font-family="system-ui,sans-serif" font-size="11" font-weight="700" text-anchor="middle">N</text></g>`;
-  return `<defs><pattern id="${gid}" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#fff" stroke-opacity=".06"/></pattern></defs><rect width="640" height="460" fill="url(#${gid})"/>${edges}${labs}${nodes}${brujula}`;
+  
+  // Título movido a la esquina superior izquierda (x=140, y=40) para que no tape a R1
+  const titulo = mini ? '' : `<g transform="translate(140 40)"><rect x="-70" y="-15" width="140" height="30" rx="15" fill="#fff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.15))"/><text font-family="system-ui,sans-serif" font-size="14" font-weight="700" fill="#14262C" text-anchor="middle" dominant-baseline="central">Huehuetenango</text></g>`;
+  
+  return `<defs><pattern id="${gid}" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#fff" stroke-opacity=".06"/></pattern></defs><rect width="640" height="460" fill="url(#${gid})"/>${edges}${labs}${nodes}${brujula}${titulo}`;
 }
 
 /* ===== PORTADA ===== */
@@ -175,7 +179,7 @@ function draw(){
   $('#ruta').innerHTML=sol?'Ruta: '+r.map((v,i)=>`<span style="${i<=S.step?'font-weight:700;border-bottom:3px solid '+col(v):'color:var(--mut)'}">${v}</span>`).join(' → '):'';
   $('#barfill').style.width=sol&&max?(S.step/max*100)+'%':'0';
   $('#prog').innerHTML=sol?r.map((v,i)=>`<button type="button" data-s="${i}" class="${i<S.step?'done':''}${i===S.step?' cur':''}" style="--c:${col(v)}" aria-label="Ir al paso ${i}">${v}</button>`).join(''):'';
-  $('#calc').innerHTML=`<div class="scroll"><table><thead><tr><th>Paso</th><th>Arista</th><th>Distancia (m)</th><th>Acumulado (m)</th></tr></thead><tbody>${rows||'<tr><td colspan="4">Pulsa «Siguiente» para empezar el recorrido.</td></tr>'}</tbody></table></div>`+
+  $('#calc').innerHTML=`<div class="scroll"><table><thead><tr><th>Paso</th><th>Arista</th><th>Metros</th><th>Acumulado (m)</th></tr></thead><tbody>${rows||'<tr><td colspan="4">Pulsa «Siguiente» para empezar el recorrido.</td></tr>'}</tbody></table></div>`+
     (sol?`<p>Recorrido completo: ${expr(r)} = <b>${fmt(sol.d)}</b></p><p>Vértices distintos: ${new Set(S.cyc?r.slice(0,-1):r).size} de ${n} · Aristas usadas: ${L.length} · Verificación: ${valid(r,S.cyc)?'correcta (no se repiten vértices y todas las aristas existen) ✓':'ERROR ✗'}</p>`:'');
   info();
 }
@@ -197,9 +201,51 @@ $('#play').onclick=play;
 $('#info').onclick=e=>{if(e.target.id==='fijar')setup(S.sel,S.cyc)};
 $('#prog').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;stop();S.step=+b.dataset.s;draw()};
 $('#sols').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;stop();S.i=+b.dataset.i;S.step=0;renderSols();draw()};
-const pick=e=>{const g=e.target.closest('.node');if(g){S.sel=g.dataset.v;draw()}};
-$('#svg').addEventListener('click',pick);
-$('#svg').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(e)}});
+
+/* Lógica del Tooltip Flotante */
+const tooltip = $('#nodo-tooltip');
+const pick = e => {
+  const g = e.target.closest('.node');
+  if (g) {
+    S.sel = g.dataset.v;
+    draw();
+    mostrarTooltip(g);
+  } else {
+    tooltip.classList.remove('visible');
+  }
+};
+
+function mostrarTooltip(g) {
+  const v = g.dataset.v; // R1, R2, etc.
+  const o = pos[v];
+  $('#tt-img').src = `Img/${v.toLowerCase()}.jpg`;
+  $('#tt-nombre').textContent = o.s;
+  
+  const svgRect = $('#svg').getBoundingClientRect();
+  const nodeRect = g.getBoundingClientRect();
+  
+  const top = nodeRect.top - svgRect.top - 120;
+  const left = nodeRect.left - svgRect.left + (nodeRect.width / 2) - 70;
+  
+  tooltip.style.top = `${top}px`;
+  tooltip.style.left = `${left}px`;
+  tooltip.classList.add('visible');
+}
+
+$('#svg').addEventListener('click', pick);
+$('#svg').addEventListener('mouseover', e => {
+  const g = e.target.closest('.node');
+  if (g) mostrarTooltip(g);
+});
+$('#svg').addEventListener('mouseout', e => {
+  if (e.target.closest('.node') && !('ontouchstart' in window)) {
+    tooltip.classList.remove('visible');
+  }
+});
+$('#svg').addEventListener('keydown', e => {
+  if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); pick(e); }
+});
+
 document.addEventListener('click',e=>{
   const g=e.target.closest('[data-go]');if(!g)return;
   const [s,m,p]=g.dataset.go.split(':');setup(s,m==='c');
@@ -210,6 +256,20 @@ document.addEventListener('click',e=>{
     if(en.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+en.target.id));
   }),{rootMargin:'-25% 0px -65% 0px'});
   secs.forEach(s=>io.observe(s));
+}
+
+/* ===== ANIMACIÓN DEL GRAFO INICIAL CON OBSERVER ===== */
+if ('IntersectionObserver' in window) {
+  const heroObserver = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('play-anim');
+        obs.unobserve(entry.target); 
+      }
+    });
+  }, { threshold: 0.3 }); 
+  
+  if ($('#hero')) heroObserver.observe($('#hero'));
 }
 
 /* ===== INICIO ===== */
