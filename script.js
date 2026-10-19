@@ -18,7 +18,7 @@ const N=[
   {id:'R1',name:'Ristorante Italiano Il Pomodoro',s:'Il Pomodoro',dir:'4ª Calle 8-40, Zona 1',t:'italiana',x:320,y:80},
   {id:'R2',name:'Monte Alto Restaurante',s:'Monte Alto',dir:'5ª Avenida 6-46, Zona 1',t:'cafe',x:220,y:260},
   {id:'R3',name:'Casa Brava',s:'Casa Brava',dir:'8ª Calle A 11-70, Zona 1',t:'carnes',x:440,y:350},
-  {id:'R4',name:'Coffee 8',s:'Coffee 8',dir:'1 calle 6-73, Zona 8',t:'cafe',x:360,y:230},
+  {id:'R4',name:'Coffee 8',s:'Coffee 8',dir:'6ª Avenida "A" 9-18, Zona 8',t:'cafe',x:360,y:230},
   {id:'R5',name:'Casa de Asados',s:'Casa de Asados',dir:'4ª Calle 5-20, Zona 1',t:'carnes',x:570,y:280},
   {id:'R6',name:'Restaurante Puerto Escondido',s:'Puerto Escondido',dir:'Sector 6, Cambote, Zona 11',t:'mariscos',x:70,y:400},
   {id:'R7',name:'Café La Tinaja',s:'La Tinaja',dir:'4ª Calle 6-51, Zona 1',t:'cafe',x:460,y:70},
@@ -103,11 +103,12 @@ $('#resnote').textContent=`Cada ciclo pasa por todos los vértices, así que su 
 const best=cyc=>ids.flatMap(v=>search(v,cyc).res).map(p=>({p,d:total(p)})).sort((a,b)=>a.d-b.d)[0];
 const goBtn=(s,m,p='')=>`<button type="button" data-go="${s}:${m}:${p}">Ver en el grafo</button>`;
 const bestCyc=best(true);
+
 $('#best').innerHTML=[[bestCyc,'Ciclo más corto','c'],[best(false),'Camino más corto','p']].map(([b,t,m])=>
-  b?`<p><b>${t}:</b> ${b.p.join(' → ')}<br>${expr(b.p)} = <b>${fmt(b.d)}</b> ${goBtn(b.p[0],m,b.p.join())}</p>`:`<p><b>${t}:</b> no existe.</p>`
+  b?`<div class="tarjeta-resultado"><h4>${t}</h4><p>${b.p.join(' → ')}<br>${expr(b.p)} = <strong>${fmt(b.d)}</strong></p>${goBtn(b.p[0],m,b.p.join())}</div>`:`<div class="tarjeta-resultado"><h4>${t}</h4><p>No existe.</p></div>`
 ).join('')+(valid(EJEMPLO,false)
-  ?`<p><b>Camino propuesto en el modelo del grupo:</b> ${EJEMPLO.join(' → ')}<br>Verificación: 8 vértices distintos y 7 aristas existentes ✓ · ${expr(EJEMPLO)} = <b>${fmt(total(EJEMPLO))}</b> ${goBtn(EJEMPLO[0],'p',EJEMPLO.join())}</p>`
-  :`<p><b>Camino propuesto en el modelo del grupo:</b> ${EJEMPLO.join(' → ')} no es válido con las aristas actuales ✗</p>`);
+  ?`<div class="tarjeta-resultado"><h4>Camino propuesto en el modelo del grupo</h4><p>${EJEMPLO.join(' → ')}<br>Verificación: 8 vértices distintos y 7 aristas existentes ✓<br>${expr(EJEMPLO)} = <strong>${fmt(total(EJEMPLO))}</strong></p>${goBtn(EJEMPLO[0],'p',EJEMPLO.join())}</div>`
+  :`<div class="tarjeta-resultado"><h4>Camino propuesto en el modelo del grupo</h4><p>${EJEMPLO.join(' → ')}<br>No es válido con las aristas actuales ✗</p></div>`);
 
 /* ===== DIBUJO DEL GRAFO (SVG) ===== */
 const pill=(k,d,x,y)=>{const w=String(d).length*7+14;return `<g class="lab" data-k="${k}" transform="translate(${x} ${y})"><rect x="${-w/2}" y="-9" width="${w}" height="18" rx="9"/><text>${d}</text></g>`};
@@ -123,7 +124,7 @@ function graphMarkup(mini,cycle){
   const nodes=N.map(o=>`<g class="node" data-v="${o.id}" ${mini?'':`tabindex="0" role="button" aria-label="${esc(o.name)}"`} transform="translate(${o.x} ${o.y})" style="--c:${col(o.id)}"><title>${esc(o.name)}</title><circle class="halo" r="27"/><circle class="ring" r="31"/><circle class="c" r="20"/><text class="lt">${o.id}</text><text class="nm" y="-30">${esc(o.s)}</text>${mini?'':'<text class="tag" x="30" y="4">inicio</text>'}</g>`).join('');
   const brujula=mini?'':`<g transform="translate(606 418)" fill="#fff" fill-opacity=".75"><path d="M0-17 6 6 0 2-6 6Z"/><text y="22" font-family="system-ui,sans-serif" font-size="11" font-weight="700" text-anchor="middle">N</text></g>`;
   
-  // Título movido a la esquina superior izquierda (x=140, y=40) para que no tape a R1
+  // Título movido a la esquina superior izquierda para no tapar R1
   const titulo = mini ? '' : `<g transform="translate(140 40)"><rect x="-70" y="-15" width="140" height="30" rx="15" fill="#fff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.15))"/><text font-family="system-ui,sans-serif" font-size="14" font-weight="700" fill="#14262C" text-anchor="middle" dominant-baseline="central">Huehuetenango</text></g>`;
   
   return `<defs><pattern id="${gid}" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#fff" stroke-opacity=".06"/></pattern></defs><rect width="640" height="460" fill="url(#${gid})"/>${edges}${labs}${nodes}${brujula}${titulo}`;
