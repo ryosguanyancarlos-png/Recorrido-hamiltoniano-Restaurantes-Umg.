@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recorridos hamiltonianos entre 8 restaurantes de Huehuetenango</title>
+<!-- Enlace al archivo CSS -->
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="hero">
+  <div class="hero-in">
+    <div>
+      <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 18px;">
+        <img src="Img/logo-umg.png" alt="Logo Universidad Mariano Gálvez" style="width: 100px; flex-shrink: 0;">
+        <p class="org">Universidad Mariano Gálvez de Guatemala, sede Huehuetenango. Curso de Matemática Discreta.</p>
+      </div>
+      <h1>Recorridos hamiltonianos entre 8 restaurantes de Huehuetenango</h1>
+      <p class="lead">¿Se puede visitar los 8 restaurantes una sola vez cada uno, moviéndose solo entre locales conectados? Este proyecto lo modela como un grafo y lo resuelve por backtracking.</p>
+      <p class="facts" id="hechos"></p>
+      <a class="btn-go" href="#visualizacion">Ver el grafo</a>
+      <p class="aviso"><b>Sobre las distancias.</b> Los restaurantes, direcciones y conexiones vienen de la investigación del grupo. Las distancias mostradas han sido <b>verificadas</b> con Google Maps para garantizar su autenticidad.</p>
+    </div>
+    <figure class="hero-map">
+      <svg id="hero" class="board mini" viewBox="0 0 640 460" role="img" aria-label="Mapa esquemático de los 8 restaurantes con el ciclo hamiltoniano más corto dibujado"></svg>
+      <figcaption id="heroCap"></figcaption>
+    </figure>
+  </div>
+</header>
+
+<div class="shell">
+
+<nav id="nav" aria-label="Secciones del proyecto">
+  <p class="brand">Ruta hamiltoniana<br>Huehuetenango</p>
+  <ol>
+    <li><a href="#problema"><i>1</i>El problema</a></li>
+    <li><a href="#modelo"><i>2</i>El modelo</a></li>
+    <li><a href="#matematica"><i>3</i>La matemática</a></li>
+    <li><a href="#solucion"><i>4</i>La solución</a></li>
+    <li><a href="#visualizacion"><i>5</i>Visualización</a></li>
+    <li><a href="#equipo"><i>6</i>El equipo</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<!-- ============ 1. EL PROBLEMA ============ -->
+<section id="problema">
+  <div class="sec-h"><span class="pin"><span>1</span></span><h2>El problema</h2></div>
+  <p>Un grupo de amigos de la cabecera de Huehuetenango quiere hacer una gira gastronómica por <b>8 restaurantes</b> de la ciudad, visitando cada uno <b>exactamente una vez</b> y trasladándose siempre entre locales conectados de forma directa, para no cruzar la ciudad de forma desordenada en horas de tráfico.</p>
+  <p>Las preguntas que responde este proyecto son:</p>
+  <ol class="pasos">
+    <li>¿Existe una ruta que visite los 8 restaurantes sin repetir ninguno? (<i>camino hamiltoniano</i>)</li>
+    <li>¿Existe una ruta que además regrese al restaurante de partida? (<i>ciclo hamiltoniano</i>)</li>
+    <li>¿Cuántas rutas hay y cuál recorre menos distancia?</li>
+  </ol>
+  <p class="note"><b>Criterio de conexión.</b> Dos restaurantes R<span class="sub">i</span> y R<span class="sub">j</span> forman una arista si la distancia vial entre ellos cumple d(R<span class="sub">i</span>, R<span class="sub">j</span>) ≤ 1.8 km y existe una vía directa que no obliga a pasar por otro restaurante de la lista.</p>
+</section>
+
+<!-- ============ 2. EL MODELO ============ -->
+<section id="modelo">
+  <div class="sec-h"><span class="pin"><span>2</span></span><h2>El modelo</h2></div>
+  <p>El problema se modela con un grafo simple, no dirigido y ponderado <b>G = (V, E, w)</b>, donde:</p>
+  <ul class="lista">
+    <li><b>V</b>: restaurantes (vértices R₁ a R₈). Aquí |V| = <span id="gn"></span>.</li>
+    <li><b>E</b>: existe la arista {u, v} si hay un trayecto directo entre u y v. Aquí |E| = <span id="gm"></span>.</li>
+    <li><b>w</b>: peso de cada arista, la distancia real en metros obtenida con Google Maps.</li>
+  </ul>
+  <div class="cols">
+    <div class="scroll"><h3>Vértices</h3><table id="tv"></table></div>
+    <div class="scroll"><h3>Aristas y distancias</h3><table id="te"></table></div>
+  </div>
+  <h3>Matriz de adyacencia ponderada</h3>
+  <p class="mut">Cada celda muestra la distancia verificada en metros; «·» indica que no hay trayecto directo.</p>
+  <div class="scroll"><table class="mx" id="tm"></table></div>
+</section>
+
+<!-- ============ 3. LA MATEMÁTICA ============ -->
+<section id="matematica">
+  <div class="sec-h"><span class="pin"><span>3</span></span><h2>La matemática</h2></div>
+  <h3>Camino y ciclo hamiltoniano</h3>
+  <p>Un <b>camino hamiltoniano</b> pasa por todos los vértices exactamente una vez. Un <b>ciclo hamiltoniano</b> es un camino hamiltoniano cuyos extremos son adyacentes, de modo que el recorrido cierra regresando al inicio.</p>
+  <div class="scroll"><table id="dif"></table></div>
+
+  <h3>Tabla de adyacencia (1 = conectados, 0 = no) y grados</h3>
+  <div class="scroll"><table class="mx" id="a01"></table></div>
+  <h3>Vecinos de cada vértice</h3>
+  <div class="scroll"><table id="adj"></table></div>
+  <p id="hand"></p>
+  <p class="mut">Teorema del apretón de manos: cada arista suma 1 al grado de cada uno de sus dos extremos, por lo que la suma de grados es siempre 2|E|.</p>
+
+  <h3>Condiciones que se pueden comprobar</h3>
+  <ul class="lista" id="cond"></ul>
+</section>
+
+<!-- ============ 4. LA SOLUCIÓN ============ -->
+<section id="solucion">
+  <div class="sec-h"><span class="pin"><span>4</span></span><h2>La solución</h2></div>
+  <p>La búsqueda se hace por <b>backtracking</b> (vuelta atrás), que explora todas las rutas parciales válidas:</p>
+  <ol class="pasos">
+    <li>Se fija el vértice inicial y se marca como visitado.</li>
+    <li>Desde el vértice actual u se revisan sus vecinos en orden.</li>
+    <li>Solo se avanza hacia un vecino v si la arista {u, v} existe y v no está visitado.</li>
+    <li>Cuando la ruta tiene los 8 vértices: en modo <i>camino</i> se guarda; en modo <i>ciclo</i> se guarda solo si el último vértice es adyacente al inicial (se agrega la arista de cierre).</li>
+    <li>Se retrocede: se desmarca v y se prueba el siguiente vecino.</li>
+  </ol>
+  <p>En el peor caso hay (n−1)! rutas por revisar; con n = 8 son 5040 y el cálculo es instantáneo.</p>
+  <h3>Resultados por vértice inicial</h3>
+  <div class="scroll"><table id="res"></table></div>
+  <p id="resnote" class="mut"></p>
+  <div id="best"></div>
+</section>
+
+<!-- ============ 5. VISUALIZACIÓN ============ -->
+<section id="visualizacion">
+  <div class="sec-h"><span class="pin"><span>5</span></span><h2>Visualización</h2></div>
+  <p class="mut">Elige el vértice inicial y el tipo de recorrido, pulsa «Buscar» y recorre la solución paso a paso. Haz clic en un nodo para ver su información.</p>
+  <div class="ctl">
+    <label>Vértice inicial<select id="ini"></select></label>
+    <label>Tipo de recorrido<select id="modo"><option value="c">Ciclo hamiltoniano</option><option value="p">Camino hamiltoniano</option></select></label>
+    <button type="button" class="pri" id="buscar">Buscar</button>
+    <span class="sep"></span>
+    <button type="button" id="reset">Reiniciar</button>
+    <button type="button" id="ant">Anterior</button>
+    <button type="button" id="sig">Siguiente</button>
+    <button type="button" id="play">Reproducir</button>
+  </div>
+  <p class="estado" id="estado"></p>
+  <p class="ruta" id="ruta"></p>
+  <svg id="svg" class="board" viewBox="0 0 640 460" role="group" aria-label="Grafo de 8 restaurantes de Huehuetenango con distancias verificadas en metros"></svg>
+  <div class="bar"><i id="barfill"></i></div>
+  <div id="prog" aria-label="Pasos del recorrido"></div>
+  <div id="leyenda"></div>
+  <p class="mut" style="font:13px/1.5 var(--sans);max-width:none">Línea blanca: aristas ya recorridas. Línea amarilla: último tramo. Nodo relleno: visitado. Anillo blanco: vértice actual. «inicio»: punto de partida. Anillo punteado: vértice seleccionado. Posiciones esquemáticas según las direcciones (norte arriba).</p>
+  <div class="cols" style="margin-top:20px">
+    <div class="ficha" id="info"></div>
+    <div><h3 style="margin-top:0">Soluciones encontradas</h3><p id="nsol" class="mut" style="font:13px/1.5 var(--sans)"></p><ol id="sols"></ol></div>
+  </div>
+  <h3>Cálculo paso a paso</h3>
+  <div id="calc"></div>
+</section>
+
+<!-- ============ 6. EL EQUIPO ============ -->
+<section id="equipo">
+  <div class="sec-h"><span class="pin"><span>6</span></span><h2>El equipo</h2></div>
+  <p>Este proyecto fue desarrollado y validado por estudiantes de la Universidad Mariano Gálvez de Guatemala como parte del curso de Matemática Discreta.</p>
+  
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nombre Completo</th>
+          <th>Carné</th>
+          <th>Aporte al Proyecto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Yosguan Yan Carlos Ramirez Velasques</td>
+          <td>0904-26-2006</td>
+          <td>Creación de página web y validación de las verdaderas posiciones y distancias del grafo.</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Oliver Manrique Montejo Méndez</td>
+          <td>0904-26-8727</td>
+          <td>Construcción del modelo matemático y desarrollo de la sección "La Matemática".</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Daniel Fernando Palacios Gómez</td>
+          <td>0904-26-1872</td>
+          <td>Búsqueda de la solución y validación formal del ciclo Hamiltoniano.</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Javier Mariano Ixcoy Sanic</td>
+          <td>0904-26-9225</td>
+          <td>Desarrollo de la sección "El Problema" y "El Modelo" del grafo.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+</div>
+<footer>Proyecto estudiantil de Matemática Discreta, UMG Huehuetenango. Distancias verificadas con Google Maps.</footer>
+
+<!-- Enlace al archivo JavaScript -->
+<script src="script.js"></script>
+</body>
+</html>
