@@ -1,9 +1,5 @@
-/* =====================================================================
-   IDENTIDAD VISUAL: plano urbano.
-   Papel de plano claro para leer, tablero azul petróleo para el grafo.
-   Cada tipo de cocina tiene su color (ver TIPOS en el script).
-   Sin fuentes externas: todo funciona sin internet.
-   ===================================================================== */
+
+
 :root{
   --bg:#EFF2EE; --panel:#FAFBF8; --ink:#14262C; --mut:#566970; --line:#CBD4D1; --soft:#E3EAE7;
   --acc:#0F5560; --acc-d:#0A3A42; --board:#10222A; --grid:#3B525C; --hit:#C23B22;
